@@ -10,6 +10,7 @@ import ltg.commons.LTGEventHandler;
 import ltg.commons.LTGEventListener;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 
@@ -30,7 +31,7 @@ public class HelioRoomMasterAgent {
 		// -------------------
 		eh =  new LTGEventHandler("hr-master@54.243.60.48", "hr-master", "helio-sp-13@conference.54.243.60.48");
 		try {
-			db = new MongoClient("localhost").getDB("helio-sp-13").getCollection("observations");
+			db = new MongoClient("localhost").getDB("helio-sp-13").getCollection("notes");
 		} catch (UnknownHostException e1) {
 			System.err.println("Impossible to connect to MongoDB");
 			System.exit(0);
@@ -49,7 +50,7 @@ public class HelioRoomMasterAgent {
 
 		eh.registerHandler("new_observation", new LTGEventListener() {
 			public void processEvent(LTGEvent e) {
-				storeNewObservation(e.getOrigin(), parseNewObservation(e.getPayload()));
+				storeObservation(e.getOrigin(), e.getPayload());
 			}
 		});		
 
@@ -68,7 +69,7 @@ public class HelioRoomMasterAgent {
 
 		eh.registerHandler("new_theory", new LTGEventListener() {
 			public void processEvent(LTGEvent e) {
-				storeNewTheory(e.getOrigin(), parseNewTheory(e.getPayload()));
+				storeTheory(e.getOrigin(), e.getPayload());
 			}
 		});
 
@@ -134,32 +135,24 @@ public class HelioRoomMasterAgent {
 	}
 
 
-	protected Object parseNewObservation(JsonNode payload) {
-		/*
-		 * "payload": {
-        "color": "blue",
-        "anchor": "red",
-        "reason": "Because I saw it in front"
-    }
-		 */
-		return null;
-	}
-
-
-	protected void storeNewObservation(String origin, Object parseNewObservation) {
-		// TODO Auto-generated method stub
-
+	protected void storeObservation(String origin, JsonNode payload) {
+		BasicDBObject observation = 
+				new BasicDBObject("origin", origin)
+				.append("color", payload.get("color").textValue())
+				.append("anchor", payload.get("anchor").textValue())
+				.append("reason", payload.get("reason").textValue())
+				.append("active", true);
+		db.insert(observation);
 	}
 
 
 	protected void deleteObservation(String origin, JsonNode payload) {
-		/*
-		 * "payload": {
-        "color": "blue",
-        "anchor": "red"
-    }
-		 */
-
+		BasicDBObject query = 
+				new BasicDBObject("origin", origin)
+				.append("color", payload.get("color").textValue())
+				.append("anchor", payload.get("anchor").textValue());
+		BasicDBObject update = new BasicDBObject("$set", new BasicDBObject("active", false));
+		db.update(query, update);
 	}
 
 
@@ -206,8 +199,7 @@ public class HelioRoomMasterAgent {
 	}
 
 
-	protected Object parseNewTheory(JsonNode payload) {
-		// TODO Auto-generated method stub
+	protected void storeTheory(String origin, JsonNode payload) {
 		/*
 		 * "payload": {
 		        "color": "red",
@@ -216,13 +208,6 @@ public class HelioRoomMasterAgent {
 		        "thumbnail": ""
 		    }
 		 */
-		return null;
-	}
-
-
-	protected void storeNewTheory(String origin, Object parseNewTheory) {
-		// TODO Auto-generated method stub
-
 	}
 
 
