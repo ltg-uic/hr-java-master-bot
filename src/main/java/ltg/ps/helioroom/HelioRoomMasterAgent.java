@@ -4,6 +4,7 @@
 package ltg.ps.helioroom;
 
 import java.net.UnknownHostException;
+import java.util.Date;
 
 import ltg.commons.LTGEvent;
 import ltg.commons.LTGEventHandler;
@@ -136,13 +137,16 @@ public class HelioRoomMasterAgent {
 
 
 	protected void storeObservation(String origin, JsonNode payload) {
-		BasicDBObject observation = 
+		BasicDBObject o = 
 				new BasicDBObject("origin", origin)
 				.append("color", payload.get("color").textValue())
-				.append("anchor", payload.get("anchor").textValue())
-				.append("reason", payload.get("reason").textValue())
-				.append("active", true);
-		db.insert(observation);
+				.append("anchor", payload.get("anchor").textValue());
+		BasicDBObject update_status = new BasicDBObject("$set", new BasicDBObject("active", true));
+		BasicDBObject update_history = 
+				new BasicDBObject("$push", new BasicDBObject("history", new BasicDBObject("ts", new Date()).append("action", "created").append("reason", payload.get("reason").textValue())));
+		db.update(o, update_status, true, false);
+		db.update(o, update_history);
+		
 	}
 
 
@@ -152,7 +156,10 @@ public class HelioRoomMasterAgent {
 				.append("color", payload.get("color").textValue())
 				.append("anchor", payload.get("anchor").textValue());
 		BasicDBObject update = new BasicDBObject("$set", new BasicDBObject("active", false));
+		BasicDBObject update_history = 
+				new BasicDBObject("$push", new BasicDBObject("history", new BasicDBObject("ts", new Date()).append("action", "deleted")));
 		db.update(query, update);
+		db.update(query, update_history);
 	}
 
 
