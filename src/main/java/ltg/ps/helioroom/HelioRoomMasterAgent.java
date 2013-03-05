@@ -91,9 +91,11 @@ public class HelioRoomMasterAgent {
 	protected JsonNode getDBDiff(JsonNode payload) {
 		// Put all items into notes in payload into a list
 		List<Note> clientNotes = new ArrayList<Note>();
-		Iterator<JsonNode> i = payload.get("notes").elements();
-		while (i.hasNext())
-			clientNotes.add(new Note(i.next()));
+		if (payload.get("notes")!=null) {
+			Iterator<JsonNode> i = payload.get("notes").elements();
+			while (i.hasNext())
+				clientNotes.add(new Note(i.next()));
+		}
 		// Put all items in database into a list
 		List<Note> dbNotes = new ArrayList<Note>();
 		DBCursor notes = db.find(new BasicDBObject("active", true));
