@@ -39,7 +39,8 @@ public class HelioRoomMasterAgent {
 		// -------------------
 		eh =  new LTGEventHandler("hr-master@54.243.60.48", "hr-master", "helio-sp-13@conference.54.243.60.48");
 		try {
-			db = new MongoClient("localhost").getDB("helio-sp-13").getCollection("notes");
+			//db = new MongoClient("localhost").getDB("helio-sp-13").getCollection("notes");
+			db = new MongoClient("54.243.60.48").getDB("helio-sp-13").getCollection("notes");
 		} catch (UnknownHostException e1) {
 			System.err.println("Impossible to connect to MongoDB");
 			System.exit(0);
