@@ -32,15 +32,14 @@ public class HelioRoomMasterAgent {
 	private DBCollection db;
 
 
-	public HelioRoomMasterAgent() {
+	public HelioRoomMasterAgent(String usernameAndPass, String chatAndDBId) {
 
 		// -------------------
 		// Init network and DB
 		// -------------------
-		eh =  new LTGEventHandler("hr-master@54.243.60.48", "hr-master", "helio-sp-13@conference.54.243.60.48");
+		eh =  new LTGEventHandler(usernameAndPass+"@54.243.60.48", usernameAndPass, chatAndDBId+"@conference.54.243.60.48");
 		try {
-			//db = new MongoClient("localhost").getDB("helio-sp-13").getCollection("notes");
-			db = new MongoClient("54.243.60.48").getDB("helio-sp-13").getCollection("notes");
+			db = new MongoClient("54.243.60.48").getDB(chatAndDBId).getCollection("notes");
 		} catch (UnknownHostException e1) {
 			System.err.println("Impossible to connect to MongoDB");
 			System.exit(0);
@@ -53,7 +52,6 @@ public class HelioRoomMasterAgent {
 		eh.registerHandler("init_helio", new LTGEventListener() {
 			public void processEvent(LTGEvent e) {
 				eh.generateEvent("init_helio_diff", e.getOrigin(), getDBDiff(e.getPayload()));
-
 			}
 		});
 
@@ -119,7 +117,6 @@ public class HelioRoomMasterAgent {
 		response.put("additions", additions);
 		response.put("deletions", deletions);
 		return response;
-
 	}
 
 
@@ -196,8 +193,17 @@ public class HelioRoomMasterAgent {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {	
-		new HelioRoomMasterAgent();
+	public static void main(String[] args) {
+		if (args.length != 2 || nullOrEmpty(args[0]) || nullOrEmpty(args[1])) {
+			System.out.println("Need to specify the username/password (eg. hr-master) and chatroom/DB_ID (eg. helio-sp-13). Terminating...");
+			System.exit(0);
+		}
+		new HelioRoomMasterAgent(args[0], args[1]);
+		
+	}
+	
+	public static boolean nullOrEmpty(String s) {
+		return (s==null || s=="");
 	}
 
 
