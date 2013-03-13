@@ -23,6 +23,12 @@ import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
 
 /**
+ * Master agent for HelioRoom.
+ * Note how the implementation of events for Observations and Theories
+ * are completely decoupled even if right now these two are similar.
+ * The reason is to maximize update-ability of code whenever
+ * the two might change.
+ * 
  * @author tebemis
  *
  */
@@ -59,7 +65,13 @@ public class HelioRoomMasterAgent {
 			public void processEvent(LTGEvent e) {
 				storeObservation(e.getOrigin(), e.getPayload());
 			}
-		});		
+		});
+		
+		eh.registerHandler("update_observation", new LTGEventListener() {
+			public void processEvent(LTGEvent e) {
+				storeObservation(e.getOrigin(), e.getPayload());
+			}
+		});
 
 		eh.registerHandler("remove_observation", new LTGEventListener() {
 			public void processEvent(LTGEvent e) {
@@ -68,6 +80,12 @@ public class HelioRoomMasterAgent {
 		});
 
 		eh.registerHandler("new_theory", new LTGEventListener() {
+			public void processEvent(LTGEvent e) {
+				storeTheory(e.getOrigin(), e.getPayload());
+			}
+		});
+		
+		eh.registerHandler("update_theory", new LTGEventListener() {
 			public void processEvent(LTGEvent e) {
 				storeTheory(e.getOrigin(), e.getPayload());
 			}
@@ -87,6 +105,7 @@ public class HelioRoomMasterAgent {
 	}
 
 
+	
 	protected JsonNode getDBDiff(JsonNode payload) {
 		// Put all items into notes in payload into a list
 		List<Note> clientNotes = new ArrayList<Note>();
@@ -136,8 +155,8 @@ public class HelioRoomMasterAgent {
 		// Updates history by inserting the same reason and time stamping it
 		db.update(query, update_history);
 	}
-
-
+	
+	
 	protected void deleteObservation(String origin, JsonNode payload) {
 		// Create query based on id fields: type, origin, anchor, color
 		BasicDBObject query = 
@@ -171,8 +190,8 @@ public class HelioRoomMasterAgent {
 		// Updates history by inserting the same reason and time stamping it
 		db.update(query, update_history);
 	}
-
-
+	
+	
 	protected void deleteTheory(String origin, JsonNode payload) {
 		// Create query based on id fields: type, origin, anchor, color
 		BasicDBObject query = 
