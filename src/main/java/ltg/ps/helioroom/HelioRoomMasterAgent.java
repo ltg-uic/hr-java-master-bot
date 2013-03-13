@@ -73,7 +73,7 @@ public class HelioRoomMasterAgent {
 			}
 		});
 
-		eh.registerHandler("delete_theory", new LTGEventListener() {
+		eh.registerHandler("remove_theory", new LTGEventListener() {
 			public void processEvent(LTGEvent e) {
 				deleteTheory(e.getOrigin(), e.getPayload());
 			}
