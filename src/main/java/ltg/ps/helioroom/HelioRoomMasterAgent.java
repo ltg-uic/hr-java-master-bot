@@ -57,7 +57,7 @@ public class HelioRoomMasterAgent {
 		// -----------------
 		eh.registerHandler("init_helio", new LTGEventListener() {
 			public void processEvent(LTGEvent e) {
-				eh.generateEvent("init_helio_diff", e.getOrigin(), getDBDiff(e.getOrigin(), e.getPayload()));
+				eh.generateEvent("init_helio_diff", e.getOrigin(), getDBDiff(e.getPayload()));
 			}
 		});
 
@@ -106,13 +106,13 @@ public class HelioRoomMasterAgent {
 
 
 	
-	protected JsonNode getDBDiff(String origin, JsonNode payload) {
+	protected JsonNode getDBDiff(JsonNode payload) {
 		// Put all items into notes in payload into a list
 		List<Note> clientNotes = new ArrayList<Note>();
 		if (payload.get("notes")!=null) {
 			Iterator<JsonNode> i = payload.get("notes").elements();
 			while (i.hasNext())
-				clientNotes.add(new Note(origin, i.next()));
+				clientNotes.add(new Note(i.next()));
 		}
 		// Put all items in database into a list
 		List<Note> dbNotes = new ArrayList<Note>();

@@ -21,9 +21,9 @@ public class Note {
 		this.reason = reason;
 	}
 	
-	public Note(String origin, JsonNode n) {
+	public Note(JsonNode n) {
 		this.type = n.get("type").textValue();
-		this.origin = origin;
+		this.origin = n.get("origin").textValue();
 		this.anchor = n.get("anchor").textValue();
 		this.color = n.get("color").textValue();
 		this.reason = n.get("reason").textValue();
@@ -59,6 +59,8 @@ public class Note {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (obj==null || reason==null)
+			return false;
 		if (!(obj instanceof Note))
 			return false;
 		Note n = (Note) obj;	
