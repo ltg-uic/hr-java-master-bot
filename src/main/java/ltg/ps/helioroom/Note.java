@@ -21,9 +21,9 @@ public class Note {
 		this.reason = reason;
 	}
 	
-	public Note(JsonNode n) {
+	public Note(String origin, JsonNode n) {
 		this.type = n.get("type").textValue();
-		this.origin = n.get("origin").textValue();
+		this.origin = origin;
 		this.anchor = n.get("anchor").textValue();
 		this.color = n.get("color").textValue();
 		this.reason = n.get("reason").textValue();
@@ -62,7 +62,11 @@ public class Note {
 		if (!(obj instanceof Note))
 			return false;
 		Note n = (Note) obj;	
-		if (type!=n.getType() || origin!=n.getOrigin() || anchor!=n.getAnchor() || color!=n.getColor() || reason!=n.getReason())
+		if (!type.equals(n.getType()) || 
+				!origin.equals(n.getOrigin()) || 
+				!anchor.equals(n.getAnchor()) || 
+				!color.equals(n.getColor()) || 
+				!reason.equals(n.getReason()))
 			return false;
 		return true;
 	}
