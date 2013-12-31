@@ -9,9 +9,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import ltg.commons.LTGEvent;
-import ltg.commons.LTGEventHandler;
-import ltg.commons.LTGEventListener;
+import ltg.commons.ltg_event_handler.LTGEvent;
+import ltg.commons.ltg_event_handler.SingleChatLTGEventHandler;
+import ltg.commons.ltg_event_handler.SingleChatLTGEventListener;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -34,7 +34,7 @@ import com.mongodb.MongoClient;
  */
 public class HelioRoomMasterAgent {
 
-	private LTGEventHandler eh = null;
+	private SingleChatLTGEventHandler eh = null;
 	private DBCollection db;
 
 
@@ -43,9 +43,9 @@ public class HelioRoomMasterAgent {
 		// -------------------
 		// Init network and DB
 		// -------------------
-		eh =  new LTGEventHandler(usernameAndPass+"@54.243.60.48", usernameAndPass, chatAndDBId+"@conference.54.243.60.48");
+		eh =  new SingleChatLTGEventHandler(usernameAndPass+"@ltg.evl.uic.edu", usernameAndPass, chatAndDBId+"@conference.ltg.evl.uic.edu");
 		try {
-			db = new MongoClient("54.243.60.48").getDB(chatAndDBId).getCollection("notes");
+			db = new MongoClient("ltg.evl.uic.edu").getDB(chatAndDBId).getCollection("notes");
 		} catch (UnknownHostException e1) {
 			System.err.println("Impossible to connect to MongoDB");
 			System.exit(0);
@@ -55,43 +55,43 @@ public class HelioRoomMasterAgent {
 		// -----------------
 		//Register listeners
 		// -----------------
-		eh.registerHandler("init_helio", new LTGEventListener() {
+		eh.registerHandler("init_helio", new SingleChatLTGEventListener() {
 			public void processEvent(LTGEvent e) {
-				eh.generateEvent("init_helio_diff", e.getOrigin(), getDBDiff(e.getPayload()));
+				eh.generateEvent(new LTGEvent("init_helio_diff", null, e.getOrigin(), getDBDiff(e.getPayload())));
 			}
 		});
 
-		eh.registerHandler("new_observation", new LTGEventListener() {
+		eh.registerHandler("new_observation", new SingleChatLTGEventListener() {
 			public void processEvent(LTGEvent e) {
 				storeObservation(e.getOrigin(), e.getPayload());
 			}
 		});
 		
-		eh.registerHandler("update_observation", new LTGEventListener() {
+		eh.registerHandler("update_observation", new SingleChatLTGEventListener() {
 			public void processEvent(LTGEvent e) {
 				storeObservation(e.getOrigin(), e.getPayload());
 			}
 		});
 
-		eh.registerHandler("remove_observation", new LTGEventListener() {
+		eh.registerHandler("remove_observation", new SingleChatLTGEventListener() {
 			public void processEvent(LTGEvent e) {
 				deleteObservation(e.getOrigin(), e.getPayload());
 			}
 		});
 
-		eh.registerHandler("new_theory", new LTGEventListener() {
+		eh.registerHandler("new_theory", new SingleChatLTGEventListener() {
 			public void processEvent(LTGEvent e) {
 				storeTheory(e.getOrigin(), e.getPayload());
 			}
 		});
 		
-		eh.registerHandler("update_theory", new LTGEventListener() {
+		eh.registerHandler("update_theory", new SingleChatLTGEventListener() {
 			public void processEvent(LTGEvent e) {
 				storeTheory(e.getOrigin(), e.getPayload());
 			}
 		});
 
-		eh.registerHandler("remove_theory", new LTGEventListener() {
+		eh.registerHandler("remove_theory", new SingleChatLTGEventListener() {
 			public void processEvent(LTGEvent e) {
 				deleteTheory(e.getOrigin(), e.getPayload());
 			}
@@ -101,6 +101,7 @@ public class HelioRoomMasterAgent {
 		// ------------------
 		// Run event listener
 		// ------------------
+		System.out.println("Starting " + usernameAndPass + " bot");
 		eh.runSynchronously();
 	}
 

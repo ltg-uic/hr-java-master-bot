@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ltg</groupId>
 	<artifactId>helioroom-master-agent</artifactId>
-	<version>1.2</version>
+	<version>1.2.1</version>
 
 	<name>Master agent for HelioRoom</name>
 
@@ -16,32 +16,41 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>3.1</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>ltg.ps.helioroom.HelioRoomMasterAgent</mainClass>
-						</manifest>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-			</plugin>
+			<!-- Using shade plugin to package an executable uber-jar with all deps in it -->
+            <plugin>
+            	<groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.2</version>
+                <executions>
+                	<execution>
+                    	<phase>package</phase>
+                        <goals>
+                        	<goal>shade</goal>
+                        </goals>
+                        <configuration>
+                        	<transformers>
+                            	<transformer
+                                	implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>ltg.ps.helioroom.HelioRoomMasterAgent</mainClass>
+                                </transformer>
+                            </transformers>
+                    	</configuration>
+                	</execution>
+            	</executions>
+        	</plugin>
 		</plugins>
 	</build>
 	<dependencies>
 		<dependency>
 			<groupId>ltg</groupId>
 			<artifactId>ltg-java-event-handler</artifactId>
-			<version>1.1</version>
+			<version>2.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>
