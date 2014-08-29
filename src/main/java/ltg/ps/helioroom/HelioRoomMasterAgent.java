@@ -101,7 +101,7 @@ public class HelioRoomMasterAgent {
 		// ------------------
 		// Run event listener
 		// ------------------
-		System.out.println("Starting " + usernameAndPass + " bot");
+		System.out.println("Bot " + usernameAndPass + " started");
 		eh.runSynchronously();
 	}
 
